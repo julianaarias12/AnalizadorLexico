@@ -114,9 +114,9 @@ class AnalizadorLexico (var sourceCode : String ){
                 siguienteCaracter()
                 continue
             }
-//            if(isInteger()) continue
+            if(isEntero()) continue
 //            if(isReservedWordsOrIdentifier()) continue
-//            if(isDecimal()) continue
+            if(isDecimal()) continue
 //            if(isReales('$', Categoria.REAL)) continue
 //            if(isOperadoresAritmeticos()) continue
 //            if(isAsignacion()) continue
@@ -138,5 +138,148 @@ class AnalizadorLexico (var sourceCode : String ){
             siguienteCaracter()
         }
     }
+    /**
+     * Función encargada de verificar si un token es entero
+     * @return true si el token es entero; de lo contrario, false
+     */
+    fun isEntero() : Boolean{
+        if(caracterActual.isDigit()){
+            var token = ""
+            token = concatcaracterActual(token)
+            setposicionBacktracking(filaActual,columnaActual,posicionActual)
+            siguienteCaracter()
+            while (caracterActual.isDigit() || isPoint(caracterActual)){
+                token = concatcaracterActual(token)
+                if(isPoint(caracterActual)){
+                    return backtracking()
+                }
+                siguienteCaracter()
+            }
+            return agregarToken(token, Categoria.ENTERO)
+        }
+        return false
+    }
 
+    /**
+     * Función encargada de almacenar las posiciones para hacer backtracking
+     * @param row fila actual
+     * @param column columna actual
+     * @param position posición actual
+     */
+    fun setposicionBacktracking(row: Int, column: Int, position : Int){
+        posicionBacktracking[0] = row
+        posicionBacktracking[1] = column
+        posicionBacktracking[2] = position
+    }
+
+    /**
+     * Función encargada de hacer backtracking
+     * @return false
+     */
+    fun backtracking () : Boolean{
+        filaActual = posicionBacktracking[0]
+        columnaActual = posicionBacktracking[1]
+        posicionActual = posicionBacktracking[2]
+        caracterActual = sourceCode[posicionBacktracking[2]]
+        return false
+    }
+    /**
+     * Función encargada de validar si un carácter es un guión bajo
+     * @param character carácter a validar
+     * @return true si el carácter es un guión bajo; de lo contrario, false
+     */
+    fun isUnderscore(character: Char) : Boolean{
+        return character == '_'
+    }
+
+    /**
+     * Función encargada de concatenar el carácter actual
+     * @param token a concatenar
+     * @return tokeb concatenado con el carácter actual
+     */
+    fun concatcaracterActual(token: String) : String {
+        return token + caracterActual
+    }
+
+
+    /**
+     * Función encargada de validar si un carácter es una comilla simple
+     * @param character carácter a validar
+     * @return true si el carácter es una comilla simple; de lo contrario, false
+     */
+    fun isSingleQuote(character: Char) : Boolean{
+        return character == '\''
+    }
+
+    /**
+     * Función encargada de validar si un carácter es una suma
+     * @param character carácter a validar
+     * @return true si el carácter es una suma; de lo contrario, false
+     */
+    fun isPlus(character: Char) : Boolean{
+        return character == '+'
+    }
+
+    /**
+     * Función encargada de validar si un carácter es un igual
+     * @param character carácter a validar
+     * @return true si el carácter es un igual; de lo contrario, false
+     */
+    fun isEquals(character: Char) : Boolean{
+        return character == '='
+    }
+
+    /**
+     * Función encargada de validar si un carácter es un punto
+     * @param character carácter a validar
+     * @return true si el carácter es un punto; de lo contrario, false
+     */
+    fun isPoint(character: Char) : Boolean{
+        return character == '.'
+    }
+
+    /**
+     * Función encargada de verificar si un token es decimal
+     * @return true si el token es entero; de lo contrario, false
+     */
+    fun isDecimal() : Boolean{
+        if(caracterActual.isDigit() || isPoint(caracterActual)){
+            var token = ""
+            setposicionBacktracking(filaActual,columnaActual,posicionActual)
+            if(isPoint(caracterActual)){
+                token = concatcaracterActual(token)
+                siguienteCaracter()
+                if(caracterActual.isDigit()){
+                    token = concatcaracterActual(token)
+                    siguienteCaracter()
+                }else{
+                    return backtracking()
+                }
+            }else{
+                token = concatcaracterActual(token)
+                siguienteCaracter()
+                while(caracterActual.isDigit()){
+                    token = concatcaracterActual(token)
+                    siguienteCaracter()
+                }
+                if(isPoint(caracterActual)){
+                    token = concatcaracterActual(token)
+                    setposicionBacktracking(filaActual,columnaActual,posicionActual)
+                    siguienteCaracter()
+                    if(caracterActual.isDigit()){
+                        token = concatcaracterActual(token)
+                        siguienteCaracter()
+                    }else{
+                        return agregarToken(token.substring(0,token.length-2),Categoria.ENTERO)
+                    }
+                }
+            }
+            while(caracterActual.isDigit()){
+                token = concatcaracterActual(token)
+                siguienteCaracter()
+            }
+            return agregarToken(token, Categoria.DECIMAL)
+        }
+        return false
+    }
 }
