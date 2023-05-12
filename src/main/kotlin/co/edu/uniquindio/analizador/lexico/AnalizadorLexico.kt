@@ -117,7 +117,7 @@ class AnalizadorLexico (var sourceCode : String ){
             if(isEntero()) continue
 //            if(isReservedWordsOrIdentifier()) continue
             if(isDecimal()) continue
-//            if(isReales('$', Categoria.REAL)) continue
+           if(isReales('$', Categoria.REAL)) continue
 //            if(isOperadoresAritmeticos()) continue
 //            if(isAsignacion()) continue
 //            if(isIncrementoODecremento('+')) continue
@@ -125,7 +125,7 @@ class AnalizadorLexico (var sourceCode : String ){
 //            if(isOperadoresRelacionales()) continue
 //            if(isOperadoresLogicos()) continue
 //            if(isString()) continue
-//            if(isHexadecimal('¡')) continue
+           if(isHexadecimal('¡')) continue
 //            if(isComentarioLinea('\\')) continue
 //            if(isComentarioBloque()) continue
 //            if(isOtroCaracter(',', Categoria.SEPARADOR)) continue
@@ -159,6 +159,105 @@ class AnalizadorLexico (var sourceCode : String ){
         }
         return false
     }
+
+    fun isDecimal() : Boolean{
+        if(caracterActual.isDigit() || isPoint(caracterActual)){
+            var token = ""
+            setposicionBacktracking(filaActual,columnaActual,posicionActual)
+            if(isPoint(caracterActual)){
+                token = concatcaracterActual(token)
+                siguienteCaracter()
+                if(caracterActual.isDigit()){
+                    token = concatcaracterActual(token)
+                    siguienteCaracter()
+                }else{
+                    return backtracking()
+                }
+            }else{
+                token = concatcaracterActual(token)
+                siguienteCaracter()
+                while(caracterActual.isDigit()){
+                    token = concatcaracterActual(token)
+                    siguienteCaracter()
+                }
+                if(isPoint(caracterActual)){
+                    token = concatcaracterActual(token)
+                    setposicionBacktracking(filaActual,columnaActual,posicionActual)
+                    siguienteCaracter()
+                    if(caracterActual.isDigit()){
+                        token = concatcaracterActual(token)
+                        siguienteCaracter()
+                    }else{
+                        return agregarToken(token.substring(0,token.length-2),Categoria.ENTERO)
+                    }
+                }
+            }
+            while(caracterActual.isDigit()){
+                token = concatcaracterActual(token)
+                siguienteCaracter()
+            }
+            return agregarToken(token, Categoria.DECIMAL)
+        }
+        return false
+    }
+    fun isReales(operador:Char, categoria:Categoria) : Boolean{
+        // $-9, $9
+        if(caracterActual==operador) {
+            var token = ""
+
+            siguienteCaracter()
+            setposicionBacktracking(filaActual, columnaActual, posicionActual)
+
+
+            if (caracterActual.isDigit() || caracterActual.equals('-')) {
+                token = concatcaracterActual(token)
+                setposicionBacktracking(filaActual, columnaActual, posicionActual)
+                siguienteCaracter()
+                while (caracterActual.isDigit() || isPoint(caracterActual)) {
+                    token = concatcaracterActual(token)
+                    if (isPoint(caracterActual)) {
+                        return backtracking()
+                    }
+                    siguienteCaracter()
+                }
+                return agregarToken(token, Categoria.REAL)
+            }
+        }
+        return false
+    }
+
+    /**
+     * Función encargada de verificar si un token es un hexadecimal
+     * @return true si el token es es una cadena; de lo contrario, false
+     */
+    fun isHexadecimal(operador:Char ) : Boolean{
+        // $-9, $9
+        if(caracterActual==operador) {
+            var token = ""
+            siguienteCaracter()
+            setposicionBacktracking(filaActual, columnaActual, posicionActual)
+
+
+            if (caracterActual.isDigit() || hexadecimales.contains(caracterActual)) {
+                token = concatcaracterActual(token)
+                setposicionBacktracking(filaActual, columnaActual, posicionActual)
+                siguienteCaracter()
+                while (caracterActual.isDigit() || hexadecimales.contains(caracterActual)) {
+                    token = concatcaracterActual(token)
+
+                    siguienteCaracter()
+                }
+                return agregarToken(token, Categoria.HEXADECIMAL)
+            }
+        }
+        return false
+    }
+
+
+
+
+
+
 
     /**
      * Función encargada de almacenar las posiciones para hacer backtracking
@@ -242,44 +341,5 @@ class AnalizadorLexico (var sourceCode : String ){
      * Función encargada de verificar si un token es decimal
      * @return true si el token es entero; de lo contrario, false
      */
-    fun isDecimal() : Boolean{
-        if(caracterActual.isDigit() || isPoint(caracterActual)){
-            var token = ""
-            setposicionBacktracking(filaActual,columnaActual,posicionActual)
-            if(isPoint(caracterActual)){
-                token = concatcaracterActual(token)
-                siguienteCaracter()
-                if(caracterActual.isDigit()){
-                    token = concatcaracterActual(token)
-                    siguienteCaracter()
-                }else{
-                    return backtracking()
-                }
-            }else{
-                token = concatcaracterActual(token)
-                siguienteCaracter()
-                while(caracterActual.isDigit()){
-                    token = concatcaracterActual(token)
-                    siguienteCaracter()
-                }
-                if(isPoint(caracterActual)){
-                    token = concatcaracterActual(token)
-                    setposicionBacktracking(filaActual,columnaActual,posicionActual)
-                    siguienteCaracter()
-                    if(caracterActual.isDigit()){
-                        token = concatcaracterActual(token)
-                        siguienteCaracter()
-                    }else{
-                        return agregarToken(token.substring(0,token.length-2),Categoria.ENTERO)
-                    }
-                }
-            }
-            while(caracterActual.isDigit()){
-                token = concatcaracterActual(token)
-                siguienteCaracter()
-            }
-            return agregarToken(token, Categoria.DECIMAL)
-        }
-        return false
-    }
+
 }
