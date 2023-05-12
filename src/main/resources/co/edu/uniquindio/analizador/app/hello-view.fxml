@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="669.0" prefWidth="797.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.uniquindio.compilador.controllers.CompiladorController">
+    <children>
+        <Button fx:id="btnAnalizar" layoutX="279.0" layoutY="345.0" mnemonicParsing="false" onAction="#analyze" prefHeight="25.0" prefWidth="120.0" text="Analizar">
+         <font>
+            <Font name="System Bold Italic" size="13.0" />
+         </font></Button>
+        <TabPane layoutX="14.0" layoutY="383.0" prefHeight="230.0" prefWidth="764.0" tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab text="Tokens">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                            <children>
+                                <TableView fx:id="tablaPrincipal" prefHeight="224.0" prefWidth="764.0">
+                                    <columns>
+                                        <TableColumn fx:id="colRow" editable="false" prefWidth="50.0" resizable="false" sortable="false" text="FILA" />
+                                        <TableColumn fx:id="colColumn" editable="false" prefWidth="81.39999389648438" resizable="false" sortable="false" text="COLUMNA" />
+                                        <TableColumn fx:id="colCategory" editable="false" prefWidth="341.80003356933594" resizable="false" sortable="false" text="CATEGORIA" />
+                                        <TableColumn fx:id="coltoken" editable="false" minWidth="0.0" prefWidth="289.4000244140625" resizable="false" sortable="false" text="TOKEN" />
+                                    </columns>
+                                    <columnResizePolicy>
+                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                    </columnResizePolicy>
+                                </TableView>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+                <Tab text="Errores">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="171.0" prefWidth="510.0">
+                            <children>
+                                <TableView fx:id="tableError" layoutX="1.0" prefHeight="203.0" prefWidth="764.0">
+                                    <columns>
+                                        <TableColumn fx:id="colRowError" prefWidth="50.0" text="FILA" />
+                                        <TableColumn fx:id="colColumnError" prefWidth="91.39999389648438" text="COLUMNA" />
+                                        <TableColumn fx:id="colError" prefWidth="622.1999969482422" text="ERROR" />
+                                    </columns>
+                                </TableView>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+
+
+            </tabs>
+        </TabPane>
+        <TabPane layoutX="14.0" layoutY="59.0" prefHeight="275.0" prefWidth="764.0" tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab text="Código:">
+                    <content>
+                        <TextArea fx:id="txtCodigo" prefHeight="298.0" prefWidth="788.0" />
+                    </content>
+                </Tab>
+
+            </tabs>
+        </TabPane>
+      <Label layoutX="235.0" layoutY="5.0" text="ANALIZADOR LEXICO">
+         <font>
+            <Font name="System Bold Italic" size="36.0" />
+         </font>
+      </Label>
+      <Button fx:id="btnBorrar" layoutX="448.0" layoutY="345.0" mnemonicParsing="false" onAction="#borrar" prefHeight="27.0" prefWidth="107.0" text="Borrar">
+         <font>
+            <Font name="System Bold Italic" size="13.0" />
+         </font></Button>
+    </children>
+</AnchorPane>
