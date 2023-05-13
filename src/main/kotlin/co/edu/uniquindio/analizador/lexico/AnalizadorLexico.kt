@@ -115,7 +115,7 @@ class AnalizadorLexico (var sourceCode : String ){
                 continue
             }
             if(isEntero()) continue
-//            if(isReservedWordsOrIdentifier()) continue
+            if(isPalabraReservadaOIdentificador()) continue
             if(isDecimal()) continue
            if(isReales('$', Categoria.REAL)) continue
 //            if(isOperadoresAritmeticos()) continue
@@ -156,6 +156,38 @@ class AnalizadorLexico (var sourceCode : String ){
                 siguienteCaracter()
             }
             return agregarToken(token, Categoria.ENTERO)
+        }
+        return false
+    }
+
+    /**
+     * Función encargada de verificar si un token es una palabra reservada o un identificador
+     * @return true si el token es es una palabra reservada o un identificador; de lo contrario, false
+     */
+    fun isPalabraReservadaOIdentificador() : Boolean{
+        if(caracterActual.isLetter() ||  isUnderscore(caracterActual)){
+            var token = ""
+            token = concatcaracterActual(token)
+            setposicionBacktracking(filaActual,columnaActual,posicionActual)
+            siguienteCaracter()
+            var contador = 0;
+            while((caracterActual.isLetter() || caracterActual.isDigit() || isUnderscore(caracterActual)) && contador <9){
+                token = concatcaracterActual(token)
+                siguienteCaracter()
+                contador++
+            }
+            if(PalabrasReservadas.values().map { it.name }.contains(token)){
+                agregarToken(token, Categoria.PALABRA_RESERVADA)
+                return true
+            }else{
+                if ((caracterActual.isLetter() || caracterActual.isDigit() || isUnderscore(caracterActual))){
+                    errores.add(ErrorLexico("la longitud maxima son 10 caracteres",filaActual,columnaActual))
+                    caracterActual = finCodigoFuente
+                    posicionActual = sourceCode.length -1
+                    return  false
+                }
+                return agregarToken(token,Categoria.IDENTIFICADOR)
+            }
         }
         return false
     }
