@@ -119,9 +119,9 @@ class AnalizadorLexico (var sourceCode : String ){
             if(isDecimal()) continue
            if(isReales('$', Categoria.REAL)) continue
 //            if(isOperadoresAritmeticos()) continue
-//            if(isAsignacion()) continue
-//            if(isIncrementoODecremento('+')) continue
-//            if(isIncrementoODecremento('-')) continue
+              if(isAsignacion()) continue
+              if(isIncrementoODecremento('+')) continue
+              if(isIncrementoODecremento('-')) continue
 //            if(isOperadoresRelacionales()) continue
 //            if(isOperadoresLogicos()) continue
 //            if(isString()) continue
@@ -280,6 +280,59 @@ class AnalizadorLexico (var sourceCode : String ){
                     siguienteCaracter()
                 }
                 return agregarToken(token, Categoria.HEXADECIMAL)
+            }
+        }
+        return false
+    }
+
+    /**
+     * Función encargada de verificar si un token es asignación
+     * @return true si el token es asignación; de lo contrario, false
+     */
+    fun isAsignacion() : Boolean{
+        if(mutableListOf('=','+','-','*','/').contains(caracterActual)){
+            var token = ""
+            val previousCharacter = caracterActual
+            setposicionBacktracking(filaActual,columnaActual,posicionActual)
+            token = concatcaracterActual(token)
+            siguienteCaracter()
+            return if(isEquals(previousCharacter) && isEquals(caracterActual)){
+                // Flujo =
+                token = concatcaracterActual(token)
+                siguienteCaracter()
+                if(isEquals(caracterActual)){
+                    backtracking()
+                }else{
+                    agregarToken(token, Categoria.ASIGNACION)
+                }
+            }else if(isEquals(caracterActual)){
+                // Flujo +, -, *, /
+                token = concatcaracterActual(token)
+                siguienteCaracter()
+                agregarToken(token, Categoria.ASIGNACION)
+            }else{
+                backtracking()
+            }
+        }
+        return false
+    }
+
+    /**
+     * Función encargada de verificar si un token es incremento o decremento
+     * @param operator operador a validar
+     * @return true si el token es incremento o decremento; de lo contrario, false
+     */
+    fun isIncrementoODecremento(operator : Char): Boolean {
+        if(caracterActual==operator){
+            var token = ""
+            setposicionBacktracking(filaActual, columnaActual, posicionActual)
+            token = concatcaracterActual(token)
+            siguienteCaracter()
+            if(caracterActual==operator){
+                token = concatcaracterActual(token)
+                val categoria = if (isPlus(caracterActual)) Categoria.INCREMENTO else Categoria.DECREMENTO
+                siguienteCaracter()
+                return agregarToken(token, categoria)
             }
         }
         return false
