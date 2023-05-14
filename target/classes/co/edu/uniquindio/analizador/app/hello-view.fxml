@@ -19,7 +19,7 @@
                                 <TableView fx:id="tablaPrincipal" prefHeight="224.0" prefWidth="764.0">
                                     <columns>
                                         <TableColumn fx:id="colRow" editable="false" prefWidth="50.0" resizable="false" sortable="false" text="FILA" />
-                                        <TableColumn fx:id="colColumn" editable="false" prefWidth="81.39999389648438" resizable="false" sortable="false" text="COLUMNA" />
+                                        <TableColumn fx:id="colColumn" editable="false" prefWidth="81.39999389648438" resizable="false" sortable="false" text="POSICION" />
                                         <TableColumn fx:id="colCategory" editable="false" prefWidth="341.80003356933594" resizable="false" sortable="false" text="CATEGORIA" />
                                         <TableColumn fx:id="coltoken" editable="false" minWidth="0.0" prefWidth="289.4000244140625" resizable="false" sortable="false" text="TOKEN" />
                                     </columns>
@@ -38,7 +38,7 @@
                                 <TableView fx:id="tableError" layoutX="1.0" prefHeight="203.0" prefWidth="764.0">
                                     <columns>
                                         <TableColumn fx:id="colRowError" prefWidth="50.0" text="FILA" />
-                                        <TableColumn fx:id="colColumnError" prefWidth="91.39999389648438" text="COLUMNA" />
+                                        <TableColumn fx:id="colColumnError" prefWidth="91.39999389648438" text="POSICION" />
                                         <TableColumn fx:id="colError" prefWidth="622.1999969482422" text="ERROR" />
                                     </columns>
                                 </TableView>

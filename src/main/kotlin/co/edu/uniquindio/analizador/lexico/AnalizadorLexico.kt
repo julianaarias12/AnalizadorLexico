@@ -102,9 +102,6 @@ class AnalizadorLexico (var sourceCode : String ){
         }
     }
 
-    fun borrar(){
-
-    }
     /**
      * Función encargada de analizar el código fuente
      */
@@ -117,17 +114,17 @@ class AnalizadorLexico (var sourceCode : String ){
             if(isEntero()) continue
             if(isPalabraReservadaOIdentificador()) continue
             if(isDecimal()) continue
-           if(isReales('$', Categoria.REAL)) continue
+            if(isReales('$', Categoria.REAL)) continue
 //            if(isOperadoresAritmeticos()) continue
               if(isAsignacion()) continue
               if(isIncrementoODecremento('+')) continue
               if(isIncrementoODecremento('-')) continue
-//            if(isOperadoresRelacionales()) continue
+            if(isOperadoresRelacionales()) continue
 //            if(isOperadoresLogicos()) continue
 //            if(isString()) continue
-           if(isHexadecimal('¡')) continue
-//            if(isComentarioLinea('\\')) continue
-//            if(isComentarioBloque()) continue
+            if(isHexadecimal('¡')) continue
+            if(isComentarioLinea('\\')) continue
+            if(isComentarioBloque()) continue
 //            if(isOtroCaracter(',', Categoria.SEPARADOR)) continue
 //            if(isOtroCaracter('{', Categoria.LLAVE_IZQUIERDA)) continue
 //            if(isOtroCaracter('}', Categoria.LLAVE_DERECHA)) continue
@@ -338,7 +335,98 @@ class AnalizadorLexico (var sourceCode : String ){
         return false
     }
 
+    /**
+     * Función encargada de verificar si un token es un operador relacional
+     * @return true si el token es es un operador relacional; de lo contrario, false
+     */
+    fun isOperadoresRelacionales(): Boolean{
+        if(mutableListOf('!','=','<','>').contains(caracterActual)) {
+            var token = ""
+            setposicionBacktracking(filaActual, columnaActual, posicionActual)
+            token = concatcaracterActual(token)
+            if(caracterActual == '!'){
+                siguienteCaracter()
+                if (isEquals(caracterActual)) {
+                    token = concatcaracterActual(token)
+                    return agregarSiguiente(token, Categoria.OPERADOR_RELACIONAL)
+                }
+                return backtracking()
+            }
+            else if (caracterActual == '<' || caracterActual == '>') {
+                siguienteCaracter()
+                if (isEquals(caracterActual)) {
+                    token = concatcaracterActual(token)
+                    return agregarSiguiente(token, Categoria.OPERADOR_RELACIONAL)
+                }
+                return agregarToken(token, Categoria.OPERADOR_RELACIONAL)
+            } else {
+                siguienteCaracter()
+                if (isEquals(caracterActual)) {
+                    token = concatcaracterActual(token)
+                    siguienteCaracter()
+                    if (isEquals(caracterActual)) {
+                        token = concatcaracterActual(token)
+                        return agregarSiguiente(token, Categoria.OPERADOR_RELACIONAL)
+                    } else {
+                        return agregarToken(token, Categoria.OPERADOR_RELACIONAL)
+                    }
+                } else {
+                    return backtracking()
+                }
+            }
+        }
+        return false
+    }
 
+    /**
+     * Función encargada de verificar si un token es un comentario de linea
+     * @return true si el token es es una comentario de liena; de lo contrario, false
+     */
+    fun isComentarioLinea(operator : Char): Boolean {
+        if(caracterActual==operator){
+            var token = ""
+            setposicionBacktracking(filaActual, columnaActual, posicionActual)
+            token = concatcaracterActual(token)
+            siguienteCaracter()
+            if(caracterActual==operator){
+                token = concatcaracterActual(token)
+                siguienteCaracter()
+                while(!caracteresEspeciales.contains(caracterActual) && caracterActual != finCodigoFuente ){
+                    token = concatcaracterActual(token)
+                    siguienteCaracter()
+                }
+                return agregarToken(token, Categoria.COMENTARIO_LINEA)
+            }
+        }
+        return false
+    }
+
+
+    /**
+     * Función encargada de verificar si un token es un comentario en bloque
+     * @return true si el token es es una cadena; de lo contrario, false
+     */
+    fun isComentarioBloque() : Boolean{
+        if(caracterActual == '#'){
+            var token = ""
+            setposicionBacktracking(filaActual,columnaActual,posicionActual)
+            token = concatcaracterActual(token)
+            siguienteCaracter()
+            while(caracterActual != '#'){
+                token = concatcaracterActual(token)
+                siguienteCaracter()
+                if(caracterActual == finCodigoFuente){
+                    errores.add(ErrorLexico("No se cerro el comentario en bloque",filaActual,columnaActual))
+                    backtracking()
+                    siguienteCaracter()
+                    return true
+                }
+            }
+            token = concatcaracterActual(token)
+            return agregarSiguiente(token,Categoria.COMENTARIO_BLOQUE)
+        }
+        return false
+    }
 
 
 
