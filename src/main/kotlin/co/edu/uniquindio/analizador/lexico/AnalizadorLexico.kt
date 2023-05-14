@@ -115,22 +115,22 @@ class AnalizadorLexico (var sourceCode : String ){
             if(isPalabraReservadaOIdentificador()) continue
             if(isDecimal()) continue
             if(isReales('$', Categoria.REAL)) continue
-//            if(isOperadoresAritmeticos()) continue
-              if(isAsignacion()) continue
-              if(isIncrementoODecremento('+')) continue
-              if(isIncrementoODecremento('-')) continue
+            if(isOperadoresAritmeticos()) continue
+            if(isAsignacion()) continue
+            if(isIncrementoODecremento('+')) continue
+            if(isIncrementoODecremento('-')) continue
             if(isOperadoresRelacionales()) continue
-              if(isOperadoresLogicos()) continue
-              if(isString()) continue
+            if(isOperadoresLogicos()) continue
+            if(isString()) continue
             if(isHexadecimal('¡')) continue
             if(isComentarioLinea('\\')) continue
             if(isComentarioBloque()) continue
-//            if(isOtroCaracter(',', Categoria.SEPARADOR)) continue
-//            if(isOtroCaracter('{', Categoria.LLAVE_IZQUIERDA)) continue
-//            if(isOtroCaracter('}', Categoria.LLAVE_DERECHA)) continue
-//            if(isOtroCaracter('(', Categoria.PARENTESIS_IZQUIERDO)) continue
-//            if(isOtroCaracter(')', Categoria.PARENTESIS_DERECHO)) continue
-//            if(isOtroCaracter(';', Categoria.FIN_SENTENCIA)) continue
+            if(isOtroCaracter(',', Categoria.SEPARADOR)) continue
+            if(isOtroCaracter('{', Categoria.LLAVE_IZQUIERDA)) continue
+            if(isOtroCaracter('}', Categoria.LLAVE_DERECHA)) continue
+            if(isOtroCaracter('(', Categoria.PARENTESIS_IZQUIERDO)) continue
+            if(isOtroCaracter(')', Categoria.PARENTESIS_DERECHO)) continue
+            if(isOtroCaracter(';', Categoria.FIN_SENTENCIA)) continue
             errores.add(ErrorLexico("No es valido",filaActual,columnaActual))
             siguienteCaracter()
         }
@@ -489,8 +489,51 @@ class AnalizadorLexico (var sourceCode : String ){
         return false
     }
 
+    /**
+     * Función encargada de verificar si un token es un operador aritmético
+     * @return true si el token es es un operador aritmético; de lo contrario, false
+     */
+    fun isOperadoresAritmeticos(): Boolean{
+        when(caracterActual){
+            '+' -> return agregarOperadorAritmetico(mutableListOf('+','='))
+            '-' -> return agregarOperadorAritmetico(mutableListOf('-','='))
+            '/' -> return agregarOperadorAritmetico(mutableListOf('-','=','*'))
+            '*','%' -> return agregarOperadorAritmetico(mutableListOf('='))
+            else -> return false
+        }
+    }
 
+    /**
+     * Función encargada de agregar un token de un operador aritmético
+     * @return true si se agrega el operador aritmético; de lo contrario, false
+     */
+    fun agregarOperadorAritmetico(characters: MutableList<Char>): Boolean{
+        var token =  ""
+        token = concatcaracterActual(token)
+        setposicionBacktracking(filaActual,columnaActual,posicionActual)
+        siguienteCaracter()
+        return if(characters.contains(caracterActual)){
+            backtracking()
+        }else{
+            agregarToken(token,Categoria.OPERADOR_ARITMETICO)
+        }
+    }
 
+    /**
+     * Función encargada de verificar si un token es de un solo carácter
+     * @param character caracter a validar
+     * @param categoria categoría del token
+     * @return true si el token es de un solo carácter; de lo contrario, false
+     */
+    fun isOtroCaracter (character:Char, categoria:Categoria): Boolean{
+        if(caracterActual==character){
+            var token = ""
+            setposicionBacktracking(filaActual,columnaActual,posicionActual)
+            token = concatcaracterActual(token)
+            return agregarSiguiente(token,categoria)
+        }
+        return false
+    }
 
 
     /**
