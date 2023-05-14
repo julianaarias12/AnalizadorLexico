@@ -189,6 +189,11 @@ class AnalizadorLexico (var sourceCode : String ){
         return false
     }
 
+
+    /**
+     * Función encargada de verificar si un token es decimal
+     * @return true si el token es entero; de lo contrario, false
+     */
     fun isDecimal() : Boolean{
         if(caracterActual.isDigit() || isPoint(caracterActual)){
             var token = ""
@@ -614,9 +619,5 @@ class AnalizadorLexico (var sourceCode : String ){
         return character == '.'
     }
 
-    /**
-     * Función encargada de verificar si un token es decimal
-     * @return true si el token es entero; de lo contrario, false
-     */
 
 }
