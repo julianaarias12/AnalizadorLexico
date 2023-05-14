@@ -120,8 +120,8 @@ class AnalizadorLexico (var sourceCode : String ){
               if(isIncrementoODecremento('+')) continue
               if(isIncrementoODecremento('-')) continue
             if(isOperadoresRelacionales()) continue
-//            if(isOperadoresLogicos()) continue
-//            if(isString()) continue
+              if(isOperadoresLogicos()) continue
+              if(isString()) continue
             if(isHexadecimal('¡')) continue
             if(isComentarioLinea('\\')) continue
             if(isComentarioBloque()) continue
@@ -424,6 +424,67 @@ class AnalizadorLexico (var sourceCode : String ){
             }
             token = concatcaracterActual(token)
             return agregarSiguiente(token,Categoria.COMENTARIO_BLOQUE)
+        }
+        return false
+    }
+
+    /**
+     *
+     * Funcion que permite saber si una expresion es un operador logico
+     */
+    fun isOperadoresLogicos(): Boolean {
+        if(mutableListOf('!','&','|').contains(caracterActual)) {
+            var token = ""
+            setposicionBacktracking(filaActual, columnaActual, posicionActual)
+            token = concatcaracterActual(token)
+            if(caracterActual == '!'){
+                siguienteCaracter()
+                if(caracterActual=='='){
+                    return  backtracking()
+                }
+                return agregarToken(token, Categoria.OPERADOR_LOGICO)
+            }else if(caracterActual == '&'){
+                siguienteCaracter()
+                if(caracterActual == '&'){
+                    token = concatcaracterActual(token)
+                    return agregarSiguiente(token, Categoria.OPERADOR_LOGICO)
+                }
+                return backtracking()
+            }else if(caracterActual == '|'){
+                siguienteCaracter()
+                if(caracterActual == '|'){
+                    token = concatcaracterActual(token)
+                    return agregarSiguiente(token, Categoria.OPERADOR_LOGICO)
+                }
+                return backtracking()
+            }
+
+        }
+        return false
+    }
+
+    /**
+     * Función encargada de verificar si un token es una cadena de caracteres
+     * @return true si el token es es una cadena; de lo contrario, false
+     */
+    fun isString() : Boolean{
+        if(caracterActual == '\"'){
+            var token = ""
+            setposicionBacktracking(filaActual,columnaActual,posicionActual)
+            token = concatcaracterActual(token)
+            siguienteCaracter()
+            while(caracterActual != '\"'){
+                token = concatcaracterActual(token)
+                siguienteCaracter()
+                if(caracterActual == finCodigoFuente){
+                    errores.add(ErrorLexico("No se cerro la cadena",filaActual,columnaActual))
+                    backtracking()
+                    siguienteCaracter()
+                    return true
+                }
+            }
+            token = concatcaracterActual(token)
+            return agregarSiguiente(token,Categoria.CADENA_CARACTERES)
         }
         return false
     }
